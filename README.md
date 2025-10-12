@@ -46,10 +46,22 @@ Shane-Medical-Content-Empire/
 ### Prerequisites
 
 - **Unreal Engine 5.3+** - For 3D medical visualizations
-- **Python 3.9+** - For automation scripts
-- **Node.js 16+** - For web-based components
-- **FFmpeg** - For video processing
-- **Git** - For version control
+- **Python 3.8+** - For automation scripts (3.9+ recommended)
+- **FFmpeg** - For video processing (required)
+- **Node.js 16+** - For web-based components (optional)
+- **Git** - For version control (optional)
+
+### Quick Validation
+
+Before starting, validate your system configuration:
+
+```bash
+# Check system requirements and configuration
+python3 scripts/validate_config.py
+
+# Run the test suite
+python3 -m pytest tests/ -v
+```
 
 ### Installation
 
@@ -70,9 +82,19 @@ Shane-Medical-Content-Empire/
    # Edit config/automation.json with your settings
    ```
 
-4. **Make scripts executable:**
+4. **Validate configuration:**
+   ```bash
+   python3 scripts/validate_config.py
+   ```
+
+5. **Make scripts executable:**
    ```bash
    chmod +x scripts/*.sh
+   ```
+
+6. **Run tests (optional but recommended):**
+   ```bash
+   python3 -m pytest tests/ -v
    ```
 
 ### Quick Start

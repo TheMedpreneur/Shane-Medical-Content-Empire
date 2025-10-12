@@ -3,9 +3,10 @@
 ###############################################################################
 # Medical Content Build and Deploy Script
 # Automates building, testing, and deploying medical educational content
+# Version: 2.0 (Optimized)
 ###############################################################################
 
-set -e  # Exit on error
+set -euo pipefail  # Exit on error, undefined vars, pipe failures
 
 # Configuration
 PROJECT_NAME="Medical-Content-Empire"
@@ -59,16 +60,49 @@ check_prerequisites() {
     log_info "Checking prerequisites..."
     
     local missing_deps=()
+    local warnings=()
     
     # Check for required tools
     command -v python3 >/dev/null 2>&1 || missing_deps+=("python3")
-    command -v node >/dev/null 2>&1 || missing_deps+=("node")
     command -v ffmpeg >/dev/null 2>&1 || missing_deps+=("ffmpeg")
     
+    # Check for optional tools
+    command -v node >/dev/null 2>&1 || warnings+=("node (optional)")
+    command -v git >/dev/null 2>&1 || warnings+=("git (optional)")
+    
+    # Check Python version
+    if command -v python3 >/dev/null 2>&1; then
+        local python_version
+        python_version=$(python3 -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')")
+        if ! python3 -c "import sys; exit(0 if sys.version_info >= (3, 8) else 1)" 2>/dev/null; then
+            warnings+=("python3 version $python_version (recommend 3.8+)")
+        fi
+    fi
+    
+    # Check FFmpeg version
+    if command -v ffmpeg >/dev/null 2>&1; then
+        local ffmpeg_version
+        ffmpeg_version=$(ffmpeg -version 2>&1 | head -n1 | grep -o '[0-9]\+\.[0-9]\+' | head -n1)
+        log_info "FFmpeg version: $ffmpeg_version"
+    fi
+    
+    # Check disk space
+    local available_space
+    available_space=$(df -BG "$BUILD_DIR" 2>/dev/null | awk 'NR==2 {print $4}' | sed 's/G//' || echo "unknown")
+    if [[ "$available_space" != "unknown" && "$available_space" -lt 5 ]]; then
+        warnings+=("low disk space: ${available_space}GB available (recommend 5GB+)")
+    fi
+    
     if [ ${#missing_deps[@]} -ne 0 ]; then
-        log_error "Missing dependencies: ${missing_deps[*]}"
+        log_error "Missing required dependencies: ${missing_deps[*]}"
         log_info "Please install missing dependencies and try again"
         exit 1
+    fi
+    
+    if [ ${#warnings[@]} -ne 0 ]; then
+        for warning in "${warnings[@]}"; do
+            log_warning "Optional dependency missing or suboptimal: $warning"
+        done
     fi
     
     log_success "All prerequisites met"
@@ -80,28 +114,72 @@ build_videos() {
     
     local video_scripts_dir="./templates/video-scripts"
     local output_dir="$BUILD_DIR/videos"
+    local success_count=0
+    local failure_count=0
     
     if [ ! -d "$video_scripts_dir" ]; then
         log_warning "No video scripts found, skipping video build"
         return 0
     fi
     
+    # Create output directory
+    mkdir -p "$output_dir"
+    
     # Find all script files
-    local script_count=0
+    local script_files=()
     while IFS= read -r -d '' script_file; do
-        log_info "Processing script: $(basename "$script_file")"
-        
-        # Run video creation automation
-        python3 scripts/content_production_automation.py \
-            --action create-video \
-            --input "$script_file" \
-            --output "$output_dir/$(basename "${script_file%.md}")" \
-            2>&1 | tee -a "${LOG_DIR}/video_build.log"
-        
-        ((script_count++))
+        script_files+=("$script_file")
     done < <(find "$video_scripts_dir" -name "*.md" -not -name "*template*" -print0)
     
-    log_success "Built $script_count videos"
+    local total_scripts=${#script_files[@]}
+    log_info "Found $total_scripts script files to process"
+    
+    if [ $total_scripts -eq 0 ]; then
+        log_warning "No script files found, skipping video build"
+        return 0
+    fi
+    
+    # Process each script
+    for i in "${!script_files[@]}"; do
+        local script_file="${script_files[$i]}"
+        local script_name=$(basename "${script_file%.md}")
+        local progress=$((i + 1))
+        
+        log_info "[$progress/$total_scripts] Processing script: $script_name"
+        
+        # Run video creation automation with timeout
+        if timeout 300 python3 scripts/content_production_automation.py \
+            --action create-video \
+            --input "$script_file" \
+            --output "$output_dir/$script_name" \
+            --config config/automation.json \
+            2>&1 | tee -a "${LOG_DIR}/video_build_${script_name}.log"; then
+            
+            # Verify output was created
+            if [ -f "$output_dir/$script_name.mp4" ] || [ -f "$output_dir/$script_name_final.mp4" ]; then
+                log_success "Successfully built: $script_name"
+                ((success_count++))
+            else
+                log_error "Video file not found for: $script_name"
+                ((failure_count++))
+            fi
+        else
+            local exit_code=$?
+            if [ $exit_code -eq 124 ]; then
+                log_error "Timeout building video: $script_name (5 minutes)"
+            else
+                log_error "Failed to build video: $script_name (exit code: $exit_code)"
+            fi
+            ((failure_count++))
+        fi
+    done
+    
+    log_info "Video build complete: $success_count successful, $failure_count failed"
+    
+    if [ $failure_count -gt 0 ]; then
+        log_warning "Some videos failed to build. Check individual log files for details."
+        return 1
+    fi
 }
 
 # Build UE5 interactive content
@@ -148,39 +226,117 @@ generate_assessments() {
 
 # Run quality checks
 run_quality_checks() {
-    log_info "Running quality checks..."
+    log_info "Running comprehensive quality checks..."
     
     local checks_passed=true
+    local video_count=0
+    local large_files=0
+    local corrupted_files=0
     
-    # Check video quality
-    log_info "Checking video quality..."
+    # Check video quality and properties
+    log_info "Checking video quality and properties..."
     for video in "$BUILD_DIR/videos"/*.mp4; do
         if [ -f "$video" ]; then
+            ((video_count++))
+            local video_name=$(basename "$video")
+            
             # Use FFprobe to check video properties
-            ffprobe -v error -select_streams v:0 \
-                -show_entries stream=width,height,codec_name,bit_rate \
-                -of default=noprint_wrappers=1 "$video" >> "${LOG_DIR}/quality_check.log" 2>&1
+            if ffprobe -v error -select_streams v:0 \
+                -show_entries stream=width,height,codec_name,bit_rate,duration \
+                -of default=noprint_wrappers=1 "$video" > "${LOG_DIR}/quality_${video_name}.log" 2>&1; then
+                
+                # Extract video properties
+                local width height codec bitrate duration
+                width=$(grep "width=" "${LOG_DIR}/quality_${video_name}.log" | cut -d'=' -f2)
+                height=$(grep "height=" "${LOG_DIR}/quality_${video_name}.log" | cut -d'=' -f2)
+                codec=$(grep "codec_name=" "${LOG_DIR}/quality_${video_name}.log" | cut -d'=' -f2)
+                bitrate=$(grep "bit_rate=" "${LOG_DIR}/quality_${video_name}.log" | cut -d'=' -f2)
+                duration=$(grep "duration=" "${LOG_DIR}/quality_${video_name}.log" | cut -d'=' -f2)
+                
+                log_info "Video: $video_name - ${width}x${height}, $codec, ${bitrate}bps, ${duration}s"
+                
+                # Check for minimum quality standards
+                if [ -n "$width" ] && [ -n "$height" ]; then
+                    if [ "$width" -lt 1280 ] || [ "$height" -lt 720 ]; then
+                        log_warning "Low resolution video: $video_name (${width}x${height})"
+                    fi
+                fi
+                
+                if [ -n "$bitrate" ] && [ "$bitrate" -lt 1000000 ]; then
+                    log_warning "Low bitrate video: $video_name (${bitrate}bps)"
+                fi
+            else
+                log_error "Failed to analyze video: $video_name"
+                ((corrupted_files++))
+                checks_passed=false
+            fi
         fi
     done
     
-    # Check file sizes
+    # Check file sizes and detect large files
     log_info "Checking file sizes..."
-    find "$BUILD_DIR" -type f -size +100M -exec ls -lh {} \; | while read -r line; do
-        log_warning "Large file detected: $line"
+    while IFS= read -r -d '' file; do
+        local file_size
+        file_size=$(stat -c%s "$file" 2>/dev/null || echo "0")
+        local file_size_mb=$((file_size / 1024 / 1024))
+        
+        if [ $file_size_mb -gt 100 ]; then
+            log_warning "Large file detected: $(basename "$file") (${file_size_mb}MB)"
+            ((large_files++))
+        fi
+        
+        # Check for empty files
+        if [ $file_size -eq 0 ]; then
+            log_error "Empty file detected: $file"
+            ((corrupted_files++))
+            checks_passed=false
+        fi
+    done < <(find "$BUILD_DIR" -type f -print0)
+    
+    # Check for required files
+    log_info "Checking for required output files..."
+    local required_dirs=("videos" "interactives" "assessments")
+    for dir in "${required_dirs[@]}"; do
+        if [ ! -d "$BUILD_DIR/$dir" ]; then
+            log_warning "Missing output directory: $dir"
+        fi
     done
     
     # Validate medical content
     log_info "Validating medical content..."
-    python3 scripts/content_production_automation.py \
+    if python3 scripts/content_production_automation.py \
         --action validate \
         --input "$BUILD_DIR" \
-        2>&1 | tee -a "${LOG_DIR}/validation.log"
+        2>&1 | tee -a "${LOG_DIR}/validation.log"; then
+        log_success "Medical content validation passed"
+    else
+        log_error "Medical content validation failed"
+        checks_passed=false
+    fi
+    
+    # Generate quality report
+    log_info "Generating quality report..."
+    cat > "${LOG_DIR}/quality_summary.txt" << EOF
+Quality Check Summary
+====================
+Date: $(date)
+Total Videos: $video_count
+Large Files (>100MB): $large_files
+Corrupted Files: $corrupted_files
+Status: $([ $checks_passed = true ] && echo "PASSED" || echo "FAILED")
+
+Video Details:
+$(find "$BUILD_DIR/videos" -name "*.mp4" -exec basename {} \; | sort)
+
+File Size Analysis:
+$(find "$BUILD_DIR" -type f -exec ls -lh {} \; | sort -k5 -hr | head -20)
+EOF
     
     if [ $checks_passed = true ]; then
-        log_success "Quality checks passed"
+        log_success "All quality checks passed"
     else
-        log_error "Quality checks failed"
-        exit 1
+        log_error "Quality checks failed - see quality_summary.txt for details"
+        return 1
     fi
 }
 
