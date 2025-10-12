@@ -1,0 +1,28 @@
+# Python dependencies for content production automation
+
+# Core dependencies
+requests>=2.28.0
+Pillow>=9.0.0
+python-dotenv>=0.20.0
+
+# Video processing
+moviepy>=1.0.3
+
+# Data handling
+pandas>=1.4.0
+numpy>=1.22.0
+
+# Web scraping and API
+beautifulsoup4>=4.11.0
+lxml>=4.9.0
+
+# Utilities
+tqdm>=4.64.0
+python-dateutil>=2.8.2
+
+# Testing
+pytest>=7.1.0
+pytest-cov>=3.0.0
+
+# Documentation
+markdown>=3.4.0
