@@ -1,0 +1,200 @@
+---
+# Course Planning Template
+# Use this template to plan your medical education course
+
+course_info:
+  title: "[Course Title]"
+  course_code: "[e.g., MED-101]"
+  credits: 3
+  duration_weeks: 12
+  academic_year: "2024-2025"
+  semester: "Fall/Spring/Summer"
+
+instructors:
+  - name: "[Instructor Name]"
+    role: "Course Director"
+    email: "[email]"
+    credentials: "[MD, PhD, etc.]"
+  
+  - name: "[Instructor Name]"
+    role: "Co-Instructor"
+    email: "[email]"
+    credentials: "[credentials]"
+
+target_audience:
+  - "Medical Students (Year X)"
+  - "Residents"
+  - "Fellows"
+  - "Healthcare Professionals"
+
+prerequisites:
+  - course: "[Prerequisite Course]"
+    required: true
+  - course: "[Recommended Course]"
+    required: false
+
+course_description: |
+  Comprehensive description of the course, its scope, and what students
+  will learn. Include the clinical relevance and importance.
+
+learning_objectives:
+  primary:
+    - "Objective 1: [Action verb] [content] [context]"
+    - "Objective 2: [Action verb] [content] [context]"
+    - "Objective 3: [Action verb] [content] [context]"
+  
+  secondary:
+    - "Objective 4: [Action verb] [content] [context]"
+    - "Objective 5: [Action verb] [content] [context]"
+
+competencies:
+  medical_knowledge:
+    - "Competency 1"
+    - "Competency 2"
+  
+  clinical_skills:
+    - "Competency 1"
+    - "Competency 2"
+  
+  professionalism:
+    - "Competency 1"
+    - "Competency 2"
+
+modules:
+  - module_number: 1
+    title: "[Module Title]"
+    duration_hours: 8
+    topics:
+      - "Topic 1"
+      - "Topic 2"
+    learning_activities:
+      - type: "Lecture"
+        duration: "2 hours"
+      - type: "Interactive 3D Lab"
+        duration: "3 hours"
+      - type: "Case Study"
+        duration: "3 hours"
+    assessments:
+      - type: "Quiz"
+        weight: 10
+  
+  - module_number: 2
+    title: "[Module Title]"
+    duration_hours: 8
+    topics:
+      - "Topic 1"
+      - "Topic 2"
+
+assessments:
+  formative:
+    - type: "Weekly Quizzes"
+      weight: 20
+      description: "Online quizzes after each module"
+    
+    - type: "Case Analyses"
+      weight: 15
+      description: "Written analysis of clinical cases"
+  
+  summative:
+    - type: "Midterm Exam"
+      weight: 25
+      description: "Comprehensive examination"
+    
+    - type: "Final Exam"
+      weight: 30
+      description: "Cumulative final examination"
+    
+    - type: "Practical Assessment"
+      weight: 10
+      description: "Hands-on skills evaluation"
+
+grading_scale:
+  A: "90-100%"
+  B: "80-89%"
+  C: "70-79%"
+  D: "60-69%"
+  F: "Below 60%"
+
+required_materials:
+  textbooks:
+    - title: "[Textbook Title]"
+      authors: "[Authors]"
+      edition: "[Edition]"
+      isbn: "[ISBN]"
+      required: true
+  
+  resources:
+    - "UE5 Medical Content Platform access"
+    - "Online learning management system"
+    - "Medical simulation lab"
+
+technology_requirements:
+  hardware:
+    - "Computer with UE5 compatibility"
+    - "VR headset (optional)"
+    - "Stable internet connection"
+  
+  software:
+    - "Unreal Engine 5 Runtime"
+    - "LMS access"
+    - "Video conferencing tool"
+
+schedule:
+  week_1:
+    topics: ["Introduction", "Course Overview"]
+    activities: ["Orientation", "Baseline Assessment"]
+    due_dates: []
+  
+  week_2:
+    topics: ["Module 1 Content"]
+    activities: ["Lectures", "Lab Work"]
+    due_dates: ["Quiz 1"]
+
+policies:
+  attendance:
+    policy: |
+      Attendance policy description
+    
+  late_work:
+    policy: |
+      Late work policy description
+    penalty: "10% per day"
+  
+  academic_integrity:
+    policy: |
+      Academic integrity policy and honor code
+
+accessibility:
+  accommodations: |
+    Students requiring accommodations should contact the
+    Office of Disability Services.
+  
+  features:
+    - "Closed captions on all videos"
+    - "Screen reader compatible materials"
+    - "Flexible deadline options"
+
+contact_information:
+  office_hours:
+    - day: "Monday"
+      time: "2:00 PM - 4:00 PM"
+      location: "Office or Virtual"
+    - day: "Wednesday"
+      time: "2:00 PM - 4:00 PM"
+      location: "Office or Virtual"
+  
+  communication:
+    preferred_method: "Email"
+    response_time: "Within 24 hours (business days)"
+
+compliance:
+  - HIPAA
+  - Educational_Standards
+  - Institutional_Requirements
+
+metadata:
+  version: "1.0"
+  created_date: ""
+  last_modified: ""
+  approved_by: ""
+  approval_date: ""

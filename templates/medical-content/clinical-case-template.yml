@@ -1,0 +1,215 @@
+---
+# Clinical Case Template
+# Use this template for creating clinical case studies
+
+title: "[Case Title]"
+category: "clinical_case"
+medical_specialty: "[Specialty]"
+difficulty_level: "[Beginner/Intermediate/Advanced]"
+case_type: "[Diagnostic/Therapeutic/Educational]"
+
+metadata:
+  case_id: "CASE-[YYYY-MM-DD]-[XXX]"
+  author: ""
+  medical_reviewer: ""
+  review_date: ""
+  version: "1.0"
+  deidentified: true
+  compliance:
+    - HIPAA_Compliant
+    - PHI_Removed
+  target_audience:
+    - "Medical Students"
+    - "Residents"
+    - "Fellows"
+
+patient_presentation:
+  demographics:
+    age_range: "[Age range, not specific age]"
+    sex: "[Male/Female/Other]"
+    ethnicity: "[If clinically relevant]"
+  
+  chief_complaint: |
+    Patient's presenting complaint in their own words
+  
+  history_of_present_illness: |
+    Detailed chronological account of the presenting illness.
+    Include onset, duration, characteristics, and progression.
+  
+  past_medical_history:
+    - "Condition 1"
+    - "Condition 2"
+  
+  medications:
+    - medication: "Medication name"
+      dosage: "Dosage"
+      frequency: "Frequency"
+  
+  allergies:
+    - "Allergy 1"
+  
+  social_history:
+    occupation: "[If relevant]"
+    tobacco: "[Use status]"
+    alcohol: "[Use status]"
+    recreational_drugs: "[Use status]"
+  
+  family_history:
+    - "Relevant family history"
+
+physical_examination:
+  vital_signs:
+    blood_pressure: "[Range]"
+    heart_rate: "[Range]"
+    respiratory_rate: "[Range]"
+    temperature: "[Range]"
+    oxygen_saturation: "[Range]"
+  
+  general_appearance: |
+    General observation of the patient
+  
+  systems_review:
+    cardiovascular: "Findings"
+    respiratory: "Findings"
+    gastrointestinal: "Findings"
+    neurological: "Findings"
+    musculoskeletal: "Findings"
+    skin: "Findings"
+
+diagnostic_workup:
+  laboratory_tests:
+    - test: "Test name"
+      result: "[Result]"
+      reference_range: "[Normal range]"
+      interpretation: "Interpretation"
+  
+  imaging_studies:
+    - study: "Imaging type"
+      findings: "Key findings"
+      impression: "Radiologist impression"
+      ue5_asset_path: "/Game/Medical/Cases/Imaging/[ImageName]"
+  
+  special_tests:
+    - test: "Special test name"
+      result: "Result"
+      interpretation: "Interpretation"
+
+clinical_reasoning:
+  differential_diagnosis:
+    - diagnosis: "Diagnosis 1"
+      likelihood: "High/Medium/Low"
+      supporting_evidence:
+        - "Evidence point 1"
+        - "Evidence point 2"
+      against_evidence:
+        - "Evidence point 1"
+    
+    - diagnosis: "Diagnosis 2"
+      likelihood: "High/Medium/Low"
+      supporting_evidence:
+        - "Evidence"
+  
+  working_diagnosis: "Most likely diagnosis"
+  
+  diagnostic_reasoning: |
+    Explanation of the clinical reasoning process leading to the diagnosis.
+
+management:
+  treatment_plan:
+    immediate:
+      - "Immediate intervention 1"
+      - "Immediate intervention 2"
+    
+    short_term:
+      - "Short-term management 1"
+    
+    long_term:
+      - "Long-term management 1"
+  
+  medications_prescribed:
+    - medication: "Medication name"
+      dosage: "Dosage"
+      route: "Route"
+      frequency: "Frequency"
+      duration: "Duration"
+      rationale: "Why prescribed"
+  
+  procedures_performed:
+    - procedure: "Procedure name"
+      indication: "Why performed"
+      outcome: "Result"
+
+outcome:
+  clinical_course: |
+    Description of the patient's clinical course and response to treatment
+  
+  follow_up:
+    - timeline: "1 week"
+      findings: "Follow-up findings"
+    - timeline: "1 month"
+      findings: "Follow-up findings"
+  
+  final_outcome: |
+    Final patient outcome and current status
+
+educational_elements:
+  learning_objectives:
+    - "Recognize key clinical features"
+    - "Develop appropriate differential diagnosis"
+    - "Formulate evidence-based management plan"
+  
+  key_teaching_points:
+    - "Teaching point 1"
+    - "Teaching point 2"
+    - "Teaching point 3"
+  
+  discussion_questions:
+    - question: "Question 1"
+      answer: "Expected answer/discussion points"
+    - question: "Question 2"
+      answer: "Expected answer/discussion points"
+  
+  interactive_elements:
+    - type: "Virtual_Patient_Simulation"
+      description: "Interactive patient examination"
+      ue5_asset_path: "/Game/Medical/Cases/Simulations/[SimulationName]"
+    
+    - type: "Decision_Tree"
+      description: "Clinical decision-making simulator"
+      ue5_asset_path: "/Game/Medical/Cases/DecisionTrees/[TreeName]"
+
+references:
+  evidence_based_guidelines:
+    - citation: "Guideline reference"
+      url: "URL if available"
+      relevance: "How it applies to this case"
+  
+  research_articles:
+    - citation: "Research article citation"
+      doi: "10.xxxx/xxxxx"
+      key_findings: "Relevant findings"
+
+quality_assurance:
+  deidentification_verified: false
+  medical_accuracy_verified: false
+  peer_reviewed: false
+  ethical_review: false
+  date_last_reviewed: ""
+  next_review_date: ""
+
+ue5_integration:
+  case_level: "/Game/Medical/Cases/Levels/[CaseName]"
+  blueprint_class: "/Game/Medical/Blueprints/BP_ClinicalCase_[CaseName]"
+  
+  assets:
+    patient_model:
+      path: "/Game/Medical/Cases/Models/Patient_[ID]"
+      animations: ["/Game/Medical/Cases/Animations/[AnimName]"]
+    
+    examination_tools:
+      - "/Game/Medical/Tools/Stethoscope"
+      - "/Game/Medical/Tools/Reflex_Hammer"
+    
+    imaging_assets:
+      - path: "/Game/Medical/Cases/Imaging/[ImageName]"
+        type: "CT/MRI/Xray"

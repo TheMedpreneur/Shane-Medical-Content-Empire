@@ -1,0 +1,106 @@
+name: Daily UE5 Project Backup
+
+on:
+  schedule:
+    # Run daily at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch: # Allow manual trigger
+
+env:
+  BACKUP_RETENTION_DAYS: 30
+  UE5_PROJECT_PATH: './UnrealProject'
+
+jobs:
+  backup-ue5-project:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Full history for complete backup
+          lfs: true # Include LFS files for UE5 assets
+      
+      - name: Checkout LFS objects
+        run: git lfs checkout
+      
+      - name: Get current date
+        id: date
+        run: echo "date=$(date +'%Y-%m-%d_%H-%M-%S')" >> $GITHUB_OUTPUT
+      
+      - name: Create backup archive
+        run: |
+          echo "Creating backup archive..."
+          mkdir -p backups
+          
+          # Backup UE5 project files
+          if [ -d "$UE5_PROJECT_PATH" ]; then
+            tar -czf "backups/ue5-project-${{ steps.date.outputs.date }}.tar.gz" \
+              --exclude='*/Intermediate/*' \
+              --exclude='*/Binaries/*' \
+              --exclude='*/DerivedDataCache/*' \
+              --exclude='*/Saved/Crashes/*' \
+              --exclude='*/Saved/Logs/*' \
+              "$UE5_PROJECT_PATH"
+          fi
+          
+          # Backup content templates
+          if [ -d "./templates" ]; then
+            tar -czf "backups/templates-${{ steps.date.outputs.date }}.tar.gz" "./templates"
+          fi
+          
+          # Backup scripts and tools
+          if [ -d "./scripts" ]; then
+            tar -czf "backups/scripts-${{ steps.date.outputs.date }}.tar.gz" "./scripts"
+          fi
+          
+          ls -lh backups/
+      
+      - name: Generate backup manifest
+        run: |
+          cat > backups/manifest-${{ steps.date.outputs.date }}.json << EOF
+          {
+            "timestamp": "${{ steps.date.outputs.date }}",
+            "repository": "${{ github.repository }}",
+            "commit": "${{ github.sha }}",
+            "branch": "${{ github.ref_name }}",
+            "workflow_run": "${{ github.run_id }}",
+            "files": $(find backups -type f -name "*.tar.gz" -exec basename {} \; | jq -R . | jq -s .)
+          }
+          EOF
+          cat backups/manifest-${{ steps.date.outputs.date }}.json
+      
+      - name: Upload backup to artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: daily-backup-${{ steps.date.outputs.date }}
+          path: backups/
+          retention-days: ${{ env.BACKUP_RETENTION_DAYS }}
+      
+      - name: Configure AWS credentials (optional)
+        if: ${{ secrets.AWS_ACCESS_KEY_ID != '' }}
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION || 'us-east-1' }}
+      
+      - name: Upload to S3 (optional)
+        if: ${{ secrets.AWS_ACCESS_KEY_ID != '' && secrets.S3_BACKUP_BUCKET != '' }}
+        run: |
+          aws s3 sync backups/ s3://${{ secrets.S3_BACKUP_BUCKET }}/backups/${{ steps.date.outputs.date }}/ \
+            --storage-class INTELLIGENT_TIERING
+      
+      - name: Backup verification
+        run: |
+          echo "Backup completed successfully!"
+          echo "Backup size:"
+          du -sh backups/
+          echo "Files backed up:"
+          find backups -type f -exec ls -lh {} \;
+      
+      - name: Send notification
+        if: failure()
+        run: |
+          echo "::error::Daily backup failed! Please check the workflow logs."
+          # Add notification service integration here (Slack, Discord, Email, etc.)

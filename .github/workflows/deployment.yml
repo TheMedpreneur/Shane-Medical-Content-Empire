@@ -1,0 +1,243 @@
+name: Cross-Platform Deployment
+
+on:
+  push:
+    branches: [ main ]
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      target_platform:
+        description: 'Target platform for deployment'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - windows
+          - macos
+          - linux
+          - android
+          - ios
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+
+env:
+  UE5_VERSION: '5.3'
+  PROJECT_NAME: 'MedicalContentEmpire'
+
+jobs:
+  prepare-deployment:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      platforms: ${{ steps.platforms.outputs.platforms }}
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Determine version
+        id: version
+        run: |
+          if [[ $GITHUB_REF == refs/tags/* ]]; then
+            VERSION=${GITHUB_REF#refs/tags/}
+          else
+            VERSION="dev-$(date +'%Y%m%d')-${GITHUB_SHA::7}"
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Deployment version: $VERSION"
+      
+      - name: Determine target platforms
+        id: platforms
+        run: |
+          if [ "${{ github.event.inputs.target_platform }}" == "all" ] || [ -z "${{ github.event.inputs.target_platform }}" ]; then
+            PLATFORMS='["windows", "linux", "macos"]'
+          else
+            PLATFORMS='["${{ github.event.inputs.target_platform }}"]'
+          fi
+          echo "platforms=$PLATFORMS" >> $GITHUB_OUTPUT
+          echo "Target platforms: $PLATFORMS"
+
+  build-windows:
+    needs: prepare-deployment
+    if: contains(needs.prepare-deployment.outputs.platforms, 'windows')
+    runs-on: windows-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+      
+      - name: Setup build environment
+        run: |
+          echo "Setting up Windows build environment..."
+          echo "UE5 Version: ${{ env.UE5_VERSION }}"
+      
+      - name: Build Windows package
+        run: |
+          echo "Building Windows package..."
+          # UE5 build command would go here
+          # Example: RunUAT BuildCookRun -project="$PROJECT_FILE" -platform=Win64
+          
+          mkdir -p build/windows
+          echo "Windows build placeholder" > build/windows/build.txt
+      
+      - name: Package Windows build
+        run: |
+          cd build/windows
+          tar -czf ../MedicalContent-Windows-${{ needs.prepare-deployment.outputs.version }}.tar.gz .
+      
+      - name: Upload Windows artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-build-${{ needs.prepare-deployment.outputs.version }}
+          path: build/MedicalContent-Windows-${{ needs.prepare-deployment.outputs.version }}.tar.gz
+
+  build-linux:
+    needs: prepare-deployment
+    if: contains(needs.prepare-deployment.outputs.platforms, 'linux')
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+      
+      - name: Setup build environment
+        run: |
+          echo "Setting up Linux build environment..."
+          echo "UE5 Version: ${{ env.UE5_VERSION }}"
+      
+      - name: Build Linux package
+        run: |
+          echo "Building Linux package..."
+          mkdir -p build/linux
+          echo "Linux build placeholder" > build/linux/build.txt
+      
+      - name: Package Linux build
+        run: |
+          cd build/linux
+          tar -czf ../MedicalContent-Linux-${{ needs.prepare-deployment.outputs.version }}.tar.gz .
+      
+      - name: Upload Linux artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-build-${{ needs.prepare-deployment.outputs.version }}
+          path: build/MedicalContent-Linux-${{ needs.prepare-deployment.outputs.version }}.tar.gz
+
+  build-macos:
+    needs: prepare-deployment
+    if: contains(needs.prepare-deployment.outputs.platforms, 'macos')
+    runs-on: macos-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+      
+      - name: Setup build environment
+        run: |
+          echo "Setting up macOS build environment..."
+          echo "UE5 Version: ${{ env.UE5_VERSION }}"
+      
+      - name: Build macOS package
+        run: |
+          echo "Building macOS package..."
+          mkdir -p build/macos
+          echo "macOS build placeholder" > build/macos/build.txt
+      
+      - name: Package macOS build
+        run: |
+          cd build/macos
+          tar -czf ../MedicalContent-macOS-${{ needs.prepare-deployment.outputs.version }}.tar.gz .
+      
+      - name: Upload macOS artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-build-${{ needs.prepare-deployment.outputs.version }}
+          path: build/MedicalContent-macOS-${{ needs.prepare-deployment.outputs.version }}.tar.gz
+
+  create-release:
+    needs: [prepare-deployment, build-windows, build-linux, build-macos]
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+      
+      - name: Create release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            */MedicalContent-*.tar.gz
+          tag_name: ${{ needs.prepare-deployment.outputs.version }}
+          name: Release ${{ needs.prepare-deployment.outputs.version }}
+          draft: false
+          prerelease: ${{ contains(needs.prepare-deployment.outputs.version, 'dev') }}
+          body: |
+            ## Medical Content Empire Release ${{ needs.prepare-deployment.outputs.version }}
+            
+            ### Platforms
+            - Windows x64
+            - Linux x64
+            - macOS (Intel & Apple Silicon)
+            
+            ### Installation
+            1. Download the package for your platform
+            2. Extract the archive
+            3. Follow the platform-specific installation guide
+            
+            ### Changes
+            See commit history for detailed changes.
+
+  deploy-staging:
+    needs: [prepare-deployment, build-windows, build-linux, build-macos]
+    if: github.event.inputs.environment == 'staging' || (github.event.inputs.environment == '' && github.ref == 'refs/heads/main')
+    runs-on: ubuntu-latest
+    environment: staging
+    
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+      
+      - name: Deploy to staging
+        run: |
+          echo "Deploying to staging environment..."
+          echo "Version: ${{ needs.prepare-deployment.outputs.version }}"
+          # Add actual deployment commands here
+          
+      - name: Run smoke tests
+        run: |
+          echo "Running smoke tests on staging..."
+          # Add smoke test commands
+
+  deploy-production:
+    needs: [prepare-deployment, build-windows, build-linux, build-macos]
+    if: github.event.inputs.environment == 'production' && startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    environment: production
+    
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+      
+      - name: Deploy to production
+        run: |
+          echo "Deploying to production environment..."
+          echo "Version: ${{ needs.prepare-deployment.outputs.version }}"
+          # Add actual deployment commands here
+      
+      - name: Send deployment notification
+        run: |
+          echo "::notice::Production deployment completed for version ${{ needs.prepare-deployment.outputs.version }}"

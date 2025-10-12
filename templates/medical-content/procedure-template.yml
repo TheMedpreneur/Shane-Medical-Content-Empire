@@ -1,0 +1,136 @@
+---
+# Medical Procedure Template
+# Use this template for creating medical procedure educational content
+
+title: "[Procedure Name]"
+category: "procedure"
+medical_specialty: "[e.g., Cardiology, Surgery, Neurology]"
+difficulty_level: "[Beginner/Intermediate/Advanced]"
+estimated_duration: "[Duration in minutes]"
+
+metadata:
+  author: ""
+  reviewer: ""
+  review_date: ""
+  version: "1.0"
+  compliance:
+    - HIPAA
+    - FDA_21_CFR_Part_11
+  target_audience:
+    - "Medical Students"
+    - "Residents"
+    - "Practicing Physicians"
+
+content:
+  overview:
+    description: |
+      Brief overview of the procedure, its purpose, and clinical significance.
+    
+    indications:
+      - "Indication 1"
+      - "Indication 2"
+    
+    contraindications:
+      - "Contraindication 1"
+      - "Contraindication 2"
+  
+  preparation:
+    patient_preparation:
+      - "Step 1: Patient positioning"
+      - "Step 2: Consent and explanation"
+      - "Step 3: Pre-procedure checklist"
+    
+    equipment_required:
+      - item: "Equipment 1"
+        quantity: 1
+        critical: true
+      - item: "Equipment 2"
+        quantity: 2
+        critical: false
+    
+    personnel_required:
+      - role: "Physician"
+        minimum: 1
+      - role: "Nurse"
+        minimum: 1
+  
+  procedure_steps:
+    - step_number: 1
+      title: "Initial Assessment"
+      description: "Detailed description of the first step"
+      duration: "2 minutes"
+      critical_points:
+        - "Critical point 1"
+        - "Critical point 2"
+      safety_considerations:
+        - "Safety note 1"
+    
+    - step_number: 2
+      title: "Main Procedure"
+      description: "Detailed description of main steps"
+      duration: "10 minutes"
+      critical_points:
+        - "Critical point 1"
+      safety_considerations:
+        - "Safety note 1"
+  
+  post_procedure:
+    immediate_care:
+      - "Post-procedure monitoring"
+      - "Documentation requirements"
+    
+    follow_up:
+      - "Follow-up timeline"
+      - "Patient instructions"
+    
+    complications:
+      - complication: "Potential complication 1"
+        likelihood: "rare"
+        management: "Management approach"
+  
+  educational_elements:
+    learning_objectives:
+      - "Objective 1: Describe the indications for the procedure"
+      - "Objective 2: Demonstrate proper technique"
+      - "Objective 3: Recognize potential complications"
+    
+    assessment_criteria:
+      - "Criterion 1: Proper preparation"
+      - "Criterion 2: Technical proficiency"
+      - "Criterion 3: Safety awareness"
+    
+    interactive_elements:
+      - type: "3D Model"
+        description: "Interactive 3D anatomy model"
+        ue5_asset_path: "/Game/Medical/Anatomy/[AssetName]"
+      
+      - type: "Simulation"
+        description: "Virtual procedure simulation"
+        ue5_asset_path: "/Game/Medical/Simulations/[SimulationName]"
+
+references:
+  - citation: "Author et al. (Year). Title. Journal, Volume(Issue), Pages."
+    doi: "10.xxxx/xxxxx"
+    type: "primary"
+  
+  - citation: "Clinical guideline reference"
+    url: "https://example.com/guideline"
+    type: "guideline"
+
+quality_assurance:
+  medical_accuracy_verified: false
+  peer_reviewed: false
+  clinical_validation: false
+  date_last_reviewed: ""
+  next_review_date: ""
+
+ue5_integration:
+  blueprint_class: "/Game/Medical/Blueprints/BP_[ProcedureName]"
+  level_name: "[ProcedureName]_Level"
+  assets:
+    - type: "StaticMesh"
+      path: "/Game/Medical/Models/[ModelName]"
+    - type: "Animation"
+      path: "/Game/Medical/Animations/[AnimationName]"
+    - type: "Material"
+      path: "/Game/Medical/Materials/[MaterialName]"

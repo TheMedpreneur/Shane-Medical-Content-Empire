@@ -1,0 +1,181 @@
+---
+# Anatomy Lesson Template
+# Use this template for creating anatomical educational content
+
+title: "[Anatomy Topic]"
+category: "anatomy"
+body_system: "[e.g., Cardiovascular, Respiratory, Nervous]"
+difficulty_level: "[Beginner/Intermediate/Advanced]"
+estimated_duration: "[Duration in minutes]"
+
+metadata:
+  author: ""
+  medical_reviewer: ""
+  review_date: ""
+  version: "1.0"
+  compliance:
+    - HIPAA
+    - Educational_Standards
+  target_audience:
+    - "Medical Students"
+    - "Healthcare Professionals"
+    - "Pre-medical Students"
+
+content:
+  overview:
+    description: |
+      Comprehensive overview of the anatomical structure, its function,
+      and clinical relevance.
+    
+    key_concepts:
+      - "Concept 1"
+      - "Concept 2"
+      - "Concept 3"
+  
+  anatomical_structure:
+    regions:
+      - name: "Region 1"
+        description: "Detailed description"
+        boundaries:
+          superior: ""
+          inferior: ""
+          anterior: ""
+          posterior: ""
+        
+      - name: "Region 2"
+        description: "Detailed description"
+    
+    components:
+      - component: "Structure 1"
+        type: "[organ/vessel/nerve/muscle]"
+        location: "Anatomical location"
+        function: "Primary function"
+        clinical_significance: "Clinical relevance"
+        
+      - component: "Structure 2"
+        type: "[type]"
+        location: ""
+        function: ""
+        clinical_significance: ""
+  
+  relationships:
+    spatial_relationships:
+      - "Structure A is anterior to Structure B"
+      - "Structure C courses through Structure D"
+    
+    functional_relationships:
+      - "How structures work together"
+  
+  clinical_correlations:
+    common_pathologies:
+      - pathology: "Disease/Condition"
+        affected_structures: ["Structure 1", "Structure 2"]
+        presentation: "Clinical presentation"
+        imaging_findings: "Typical imaging findings"
+    
+    clinical_procedures:
+      - procedure: "Relevant procedure"
+        anatomical_considerations: "What to know"
+  
+  educational_elements:
+    learning_objectives:
+      - "Identify key anatomical structures"
+      - "Describe spatial relationships"
+      - "Explain functional significance"
+      - "Recognize clinical applications"
+    
+    interactive_elements:
+      - type: "3D_Model"
+        description: "Interactive 3D anatomical model"
+        features:
+          - "Layered dissection"
+          - "Structure highlighting"
+          - "Rotation and zoom"
+        ue5_asset_path: "/Game/Medical/Anatomy/3D_Models/[ModelName]"
+      
+      - type: "Virtual_Dissection"
+        description: "Step-by-step virtual dissection"
+        ue5_asset_path: "/Game/Medical/Anatomy/Dissections/[DissectionName]"
+      
+      - type: "Quiz"
+        description: "Interactive identification quiz"
+        question_count: 10
+        ue5_asset_path: "/Game/Medical/Quizzes/[QuizName]"
+    
+    assessment_methods:
+      - "Structure identification"
+      - "Relationship explanation"
+      - "Clinical application questions"
+
+visualization:
+  views:
+    - view_name: "Anterior View"
+      key_structures_visible: ["Structure A", "Structure B"]
+    
+    - view_name: "Lateral View"
+      key_structures_visible: ["Structure C", "Structure D"]
+    
+    - view_name: "Cross-sectional View"
+      level: "Specific anatomical level"
+      key_structures_visible: ["Structure E"]
+  
+  color_coding:
+    arteries: "Red (#FF0000)"
+    veins: "Blue (#0000FF)"
+    nerves: "Yellow (#FFFF00)"
+    muscles: "Pink (#FFC0CB)"
+    bones: "White (#FFFFFF)"
+
+references:
+  - citation: "Gray's Anatomy reference"
+    edition: "42nd Edition"
+    pages: "xxx-xxx"
+    type: "textbook"
+  
+  - citation: "Research article citation"
+    doi: "10.xxxx/xxxxx"
+    type: "research"
+  
+  - citation: "Clinical atlas citation"
+    type: "atlas"
+
+quality_assurance:
+  anatomical_accuracy_verified: false
+  peer_reviewed: false
+  clinical_validation: false
+  imaging_correlation: false
+  date_last_reviewed: ""
+  next_review_date: ""
+
+ue5_integration:
+  master_level: "/Game/Medical/Anatomy/Levels/[AnatomyTopic]_Master"
+  blueprint_class: "/Game/Medical/Blueprints/BP_AnatomyLesson_[Topic]"
+  
+  assets:
+    models:
+      - name: "[ModelName]"
+        path: "/Game/Medical/Anatomy/Models/[ModelName]"
+        lod_levels: 4
+        poly_count: 50000
+    
+    textures:
+      - name: "[TextureName]"
+        path: "/Game/Medical/Anatomy/Textures/[TextureName]"
+        resolution: "4096x4096"
+    
+    animations:
+      - name: "[AnimationName]"
+        path: "/Game/Medical/Anatomy/Animations/[AnimationName]"
+        duration: "10 seconds"
+    
+    materials:
+      - name: "[MaterialName]"
+        path: "/Game/Medical/Materials/[MaterialName]"
+        shader_type: "PBR"
+
+accessibility:
+  text_alternatives: true
+  audio_descriptions: true
+  adjustable_text_size: true
+  color_blind_friendly: true
+  keyboard_navigation: true
