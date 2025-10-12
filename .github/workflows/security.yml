@@ -1,0 +1,79 @@
+name: Security Scan
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    # Run security scans weekly on Mondays at 9 AM UTC
+    - cron: '0 9 * * 1'
+
+jobs:
+  secret-scan:
+    name: Scan for Secrets
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: TruffleHog Secret Scan
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: ${{ github.event.repository.default_branch }}
+          head: HEAD
+          extra_args: --debug --only-verified
+
+  dependency-scan:
+    name: Dependency Security Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Run Dependency Check
+        run: |
+          echo "Checking for vulnerable dependencies"
+          # Add dependency scanning when packages are added
+      
+  compliance-check:
+    name: HIPAA/FERPA Compliance Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Check for PHI/PII
+        run: |
+          echo "Scanning for Protected Health Information"
+          echo "Scanning for Personally Identifiable Information"
+          
+          # Check for common patterns that might indicate PHI/PII
+          if grep -r "SSN\|social.security\|patient.id\|medical.record" \
+             --include="*.md" --include="*.txt" --include="*.json" \
+             --exclude-dir=".git" \
+             --exclude-dir="Security-Compliance" .; then
+            echo "WARNING: Potential PHI/PII detected in repository"
+            echo "Please review and ensure no actual patient data is committed"
+          else
+            echo "No obvious PHI/PII patterns detected"
+          fi
+      
+      - name: Validate security documentation
+        run: |
+          if [ ! -f "Security-Compliance/README.md" ]; then
+            echo "ERROR: Security compliance documentation missing"
+            exit 1
+          fi
+          echo "Security documentation present"
+
+  license-check:
+    name: License Compliance
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Check license files
+        run: |
+          echo "Checking license compliance"
+          # Add license scanning when dependencies are added

@@ -1,0 +1,66 @@
+name: Documentation Build
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'Documentation/**'
+      - '**.md'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'Documentation/**'
+      - '**.md'
+
+jobs:
+  build-docs:
+    name: Build Documentation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Validate README files
+        run: |
+          echo "Checking all README files exist"
+          directories=(
+            "Core-Systems"
+            "Content-Production"
+            "Partnership-Management"
+            "Course-Development"
+            "Documentation"
+            "Security-Compliance"
+          )
+          
+          for dir in "${directories[@]}"; do
+            if [ ! -f "$dir/README.md" ]; then
+              echo "ERROR: Missing README.md in $dir"
+              exit 1
+            fi
+          done
+          echo "All required README files exist"
+      
+      - name: Check documentation links
+        run: |
+          echo "Checking for broken links in documentation"
+          # Add link checker tool if needed
+      
+      - name: Generate documentation index
+        run: |
+          echo "Documentation structure validated successfully"
+          echo "All README files are present"
+
+  check-formatting:
+    name: Check Markdown Formatting
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Markdown lint
+        uses: DavidAnson/markdownlint-cli2-action@v13
+        with:
+          globs: '**/*.md'

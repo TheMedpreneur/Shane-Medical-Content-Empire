@@ -1,0 +1,112 @@
+name: Repository Structure Validation
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  validate-structure:
+    name: Validate Repository Structure
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Check required directories
+        run: |
+          echo "Validating repository structure..."
+          
+          required_dirs=(
+            "Core-Systems/UE5-Project"
+            "Core-Systems/Ludus-AI-Blueprints"
+            "Core-Systems/Cursor-AI-Code"
+            "Content-Production/Video-Templates"
+            "Content-Production/Scripts"
+            "Partnership-Management/Client-Demos"
+            "Course-Development/Modules"
+            "Course-Development/Assessments"
+            "Documentation/Setup-Guides"
+            ".github/workflows"
+            "Security-Compliance"
+          )
+          
+          missing_dirs=()
+          for dir in "${required_dirs[@]}"; do
+            if [ ! -d "$dir" ]; then
+              missing_dirs+=("$dir")
+            fi
+          done
+          
+          if [ ${#missing_dirs[@]} -ne 0 ]; then
+            echo "ERROR: Missing required directories:"
+            printf '%s\n' "${missing_dirs[@]}"
+            exit 1
+          fi
+          
+          echo "✓ All required directories present"
+      
+      - name: Check required README files
+        run: |
+          echo "Checking for README files..."
+          
+          required_readmes=(
+            "README.md"
+            "Core-Systems/README.md"
+            "Content-Production/README.md"
+            "Partnership-Management/README.md"
+            "Course-Development/README.md"
+            "Documentation/README.md"
+            "Security-Compliance/README.md"
+          )
+          
+          missing_readmes=()
+          for readme in "${required_readmes[@]}"; do
+            if [ ! -f "$readme" ]; then
+              missing_readmes+=("$readme")
+            fi
+          done
+          
+          if [ ${#missing_readmes[@]} -ne 0 ]; then
+            echo "ERROR: Missing required README files:"
+            printf '%s\n' "${missing_readmes[@]}"
+            exit 1
+          fi
+          
+          echo "✓ All required README files present"
+      
+      - name: Check .gitignore
+        run: |
+          if [ ! -f ".gitignore" ]; then
+            echo "ERROR: .gitignore file missing"
+            exit 1
+          fi
+          
+          # Check for essential gitignore patterns
+          patterns=("node_modules" "*.log" "Binaries/" "Intermediate/")
+          missing_patterns=()
+          
+          for pattern in "${patterns[@]}"; do
+            if ! grep -q "$pattern" .gitignore; then
+              missing_patterns+=("$pattern")
+            fi
+          done
+          
+          if [ ${#missing_patterns[@]} -ne 0 ]; then
+            echo "WARNING: .gitignore missing recommended patterns:"
+            printf '%s\n' "${missing_patterns[@]}"
+          else
+            echo "✓ .gitignore properly configured"
+          fi
+      
+      - name: Generate structure report
+        run: |
+          echo "Repository Structure Report"
+          echo "=========================="
+          echo ""
+          echo "Directory tree (2 levels):"
+          tree -L 2 -d || find . -type d -maxdepth 2 | sort
+          echo ""
+          echo "Total directories: $(find . -type d | wc -l)"
+          echo "Total files: $(find . -type f | wc -l)"
+          echo "README files: $(find . -name 'README.md' | wc -l)"

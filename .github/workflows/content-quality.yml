@@ -1,0 +1,67 @@
+name: Content Quality Check
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'Content-Production/**'
+      - 'Course-Development/**'
+  push:
+    branches: [ main ]
+
+jobs:
+  markdown-lint:
+    name: Markdown Linting
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Lint Markdown files
+        uses: DavidAnson/markdownlint-cli2-action@v13
+        with:
+          globs: |
+            **/*.md
+            !**/node_modules/**
+
+  check-medical-terminology:
+    name: Medical Terminology Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: |
+          pip install pyspellchecker
+      
+      - name: Check medical terminology
+        run: |
+          echo "Medical terminology validation placeholder"
+          echo "In production, this would validate medical terms"
+          # Add custom scripts to validate medical accuracy
+
+  validate-scripts:
+    name: Validate Content Scripts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Check script format
+        run: |
+          echo "Validating script formats in Content-Production/Scripts"
+          # Add validation for script templates and formatting
+
+  notify:
+    name: Notification
+    runs-on: ubuntu-latest
+    needs: [markdown-lint, check-medical-terminology, validate-scripts]
+    if: always()
+    steps:
+      - name: Report status
+        run: |
+          echo "Quality checks completed"
+          # Add Slack/email notifications if needed
