@@ -1,0 +1,67 @@
+# Build and deployment artifacts
+build/
+deploy/
+output/
+dist/
+
+# Logs
+logs/
+*.log
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# UE5
+Binaries/
+DerivedDataCache/
+Intermediate/
+Saved/
+*.uproject
+*.sln
+*.suo
+*.pdb
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Configuration (use .example versions instead)
+config/automation.json
+
+# Temporary files
+*.tmp
+*.cache
+*.bak
+
+# Large media files (use LFS or external storage)
+*.mp4
+*.mov
+*.avi
+*.mkv
+*.webm
+
+# Package files
+*.tar.gz
+*.zip
+*.rar

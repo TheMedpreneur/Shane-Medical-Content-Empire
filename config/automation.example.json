@@ -1,0 +1,16 @@
+{
+  "ue5_project_path": "/path/to/ue5/project",
+  "content_output_path": "./output",
+  "video_resolution": "1920x1080",
+  "video_framerate": 30,
+  "video_codec": "h264",
+  "audio_bitrate": "192k",
+  "quality_preset": "high",
+  "build_dir": "./build",
+  "deploy_dir": "./deploy",
+  "log_dir": "./logs",
+  "enable_optimization": true,
+  "enable_validation": true,
+  "parallel_processing": true,
+  "max_workers": 4
+}
