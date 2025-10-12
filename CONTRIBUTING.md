@@ -83,6 +83,6 @@ All medical content must:
 
 Feel free to reach out:
 - Open an issue for questions
-- Email: support@medical-content-empire.com
+- Email: hello@shanegrindle.com
 
 Thank you for contributing!
