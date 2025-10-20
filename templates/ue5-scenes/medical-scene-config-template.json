@@ -1,0 +1,422 @@
+# UE5 Medical Scene Configuration Template
+
+## Scene Information
+- **Scene Name**: [Scene_Name]
+- **Scene Type**: [Medical Theater / Laboratory / Diagnostic Room / Virtual Anatomy]
+- **Purpose**: [Educational Content / Simulation / Demonstration]
+- **UE Version**: 5.3+
+- **Target Platform**: [PC / VR / Mobile / Web]
+
+---
+
+## Level Setup
+
+### World Settings
+```json
+{
+  "WorldName": "[SceneName]",
+  "DefaultGameMode": "BP_MedicalEducation_GameMode",
+  "DefaultPawn": "BP_FirstPersonCamera",
+  "GlobalIllumination": "Lumen",
+  "Reflections": "Lumen",
+  "ShadowQuality": "High",
+  "AntiAliasing": "TSR"
+}
+```
+
+### Lighting Configuration
+
+#### Primary Light Source
+```json
+{
+  "Type": "DirectionalLight",
+  "Name": "MainLight",
+  "Intensity": 3.5,
+  "Color": [255, 248, 240],
+  "Temperature": 5500,
+  "CastShadows": true,
+  "ShadowQuality": "High",
+  "Position": [0, 0, 500],
+  "Rotation": [-45, 45, 0]
+}
+```
+
+#### Fill Lights
+```json
+{
+  "Type": "RectLight",
+  "Name": "FillLight_01",
+  "Intensity": 1.5,
+  "Color": [240, 245, 255],
+  "Temperature": 6500,
+  "CastShadows": false,
+  "Position": [-300, 200, 200],
+  "Rotation": [30, -45, 0],
+  "Width": 200,
+  "Height": 200
+}
+```
+
+#### Accent Lights
+```json
+{
+  "Type": "SpotLight",
+  "Name": "AccentLight_Medical",
+  "Intensity": 2.0,
+  "Color": [255, 255, 255],
+  "InnerConeAngle": 15,
+  "OuterConeAngle": 35,
+  "CastShadows": true,
+  "Position": [0, -200, 250]
+}
+```
+
+### Post-Processing Volume
+```json
+{
+  "Name": "PostProcess_Medical",
+  "Enabled": true,
+  "BlendRadius": 0,
+  "BlendWeight": 1.0,
+  "Settings": {
+    "AutoExposure": {
+      "Enabled": true,
+      "Method": "Histogram",
+      "MinBrightness": 0.5,
+      "MaxBrightness": 2.0,
+      "SpeedUp": 3.0,
+      "SpeedDown": 1.5
+    },
+    "ColorGrading": {
+      "Temperature": 6500,
+      "Tint": 0,
+      "Saturation": 1.05,
+      "Contrast": 1.02,
+      "Gamma": 1.0,
+      "Gain": 1.0
+    },
+    "DepthOfField": {
+      "Enabled": false,
+      "FocalDistance": 200,
+      "DepthBlurAmount": 1.0
+    },
+    "Bloom": {
+      "Enabled": true,
+      "Intensity": 0.3,
+      "Threshold": 1.0
+    },
+    "AmbientOcclusion": {
+      "Enabled": true,
+      "Intensity": 0.5,
+      "Radius": 100
+    }
+  }
+}
+```
+
+---
+
+## Camera Setup
+
+### Main Camera Configuration
+```json
+{
+  "CameraName": "MainCamera",
+  "Type": "CineCameraActor",
+  "Location": [0, -400, 150],
+  "Rotation": [0, 0, 0],
+  "FOV": 75,
+  "FocalLength": 35,
+  "Aperture": 2.8,
+  "FocusSettings": {
+    "FocusMethod": "Manual",
+    "ManualFocusDistance": 400
+  },
+  "LensSettings": {
+    "MinFocalLength": 24,
+    "MaxFocalLength": 85,
+    "MinFStop": 1.4,
+    "MaxFStop": 22
+  }
+}
+```
+
+### Camera Sequencer Track
+```json
+{
+  "SequenceName": "CameraSequence_Main",
+  "Duration": 120,
+  "FrameRate": 30,
+  "Keyframes": [
+    {
+      "Time": 0.0,
+      "Location": [0, -400, 150],
+      "Rotation": [0, 0, 0],
+      "FOV": 75
+    },
+    {
+      "Time": 5.0,
+      "Location": [100, -350, 150],
+      "Rotation": [0, 10, 0],
+      "FOV": 75
+    }
+  ]
+}
+```
+
+---
+
+## Medical Asset Configuration
+
+### Anatomical Models
+```json
+{
+  "Models": [
+    {
+      "AssetName": "SM_Heart_Anatomical",
+      "AssetPath": "/Game/Medical/Anatomy/Cardiovascular/",
+      "Location": [0, 0, 100],
+      "Rotation": [0, 0, 0],
+      "Scale": [1, 1, 1],
+      "Material": "M_Anatomical_Standard",
+      "LODSettings": {
+        "LOD0": "High Detail",
+        "LOD1": "Medium Detail",
+        "LOD2": "Low Detail"
+      }
+    }
+  ]
+}
+```
+
+### Medical Equipment
+```json
+{
+  "Equipment": [
+    {
+      "AssetName": "SM_MRI_Machine",
+      "AssetPath": "/Game/Medical/Equipment/Diagnostic/",
+      "Location": [-200, 0, 0],
+      "Rotation": [0, 90, 0],
+      "Scale": [1, 1, 1],
+      "Material": "M_Medical_Equipment",
+      "Interactive": true,
+      "Blueprint": "BP_MRI_Interactive"
+    }
+  ]
+}
+```
+
+### Particle Systems
+```json
+{
+  "ParticleSystems": [
+    {
+      "Name": "PS_Blood_Flow",
+      "SystemPath": "/Game/Medical/VFX/Cardiovascular/",
+      "Location": [0, 0, 100],
+      "AutoActivate": false,
+      "LoopDuration": 5.0
+    }
+  ]
+}
+```
+
+---
+
+## Interactive Elements
+
+### Widget Blueprints
+```json
+{
+  "Widgets": [
+    {
+      "WidgetName": "WBP_MedicalInfo",
+      "WidgetPath": "/Game/UI/Medical/",
+      "AnchorLocation": "TopLeft",
+      "Visible": true,
+      "Interactive": true
+    }
+  ]
+}
+```
+
+### Blueprint Actors
+```json
+{
+  "Blueprints": [
+    {
+      "BlueprintName": "BP_Interactive_Organ",
+      "BlueprintPath": "/Game/Blueprints/Medical/",
+      "Location": [0, 0, 100],
+      "Functions": [
+        "OnHover_ShowInfo",
+        "OnClick_ToggleLayer",
+        "OnRotate_UpdateView"
+      ]
+    }
+  ]
+}
+```
+
+---
+
+## Material Setup
+
+### Standard Medical Material
+```json
+{
+  "MaterialName": "M_Medical_Standard",
+  "MaterialPath": "/Game/Materials/Medical/",
+  "BaseColor": {
+    "Type": "Texture",
+    "TexturePath": "/Game/Textures/Medical/T_Medical_BaseColor"
+  },
+  "Roughness": 0.5,
+  "Metallic": 0.0,
+  "Normal": {
+    "Type": "Texture",
+    "TexturePath": "/Game/Textures/Medical/T_Medical_Normal"
+  },
+  "Opacity": 1.0,
+  "TwoSided": false
+}
+```
+
+### Transparent Tissue Material
+```json
+{
+  "MaterialName": "M_Tissue_Transparent",
+  "MaterialPath": "/Game/Materials/Medical/",
+  "BlendMode": "Translucent",
+  "BaseColor": [255, 220, 200],
+  "Opacity": 0.3,
+  "Refraction": 1.33,
+  "Subsurface": true
+}
+```
+
+---
+
+## Audio Configuration
+
+### Ambient Sound
+```json
+{
+  "SoundName": "A_Medical_Ambient",
+  "SoundPath": "/Game/Audio/Medical/Ambient/",
+  "Location": [0, 0, 0],
+  "Attenuation": {
+    "InnerRadius": 500,
+    "OuterRadius": 2000,
+    "FalloffDistance": 1500
+  },
+  "Volume": 0.5,
+  "Loop": true
+}
+```
+
+### Interaction Sounds
+```json
+{
+  "SoundCues": [
+    {
+      "CueName": "SC_UI_Click",
+      "CuePath": "/Game/Audio/UI/",
+      "Volume": 0.7,
+      "Pitch": 1.0
+    }
+  ]
+}
+```
+
+---
+
+## Performance Optimization
+
+### LOD Settings
+- **Distance 0-500**: LOD 0 (High Detail)
+- **Distance 500-1500**: LOD 1 (Medium Detail)
+- **Distance 1500+**: LOD 2 (Low Detail)
+
+### Culling Settings
+```json
+{
+  "CullingDistance": 5000,
+  "OcclusionCulling": true,
+  "DistanceCulling": true,
+  "FrustumCulling": true
+}
+```
+
+### Texture Streaming
+```json
+{
+  "TextureStreaming": true,
+  "TexturePoolSize": 2000,
+  "MipMapBias": 0
+}
+```
+
+---
+
+## VR-Specific Settings (if applicable)
+
+### VR Camera
+```json
+{
+  "VRMode": true,
+  "IPD": 64,
+  "HeadTrackingEnabled": true,
+  "HandTrackingEnabled": true,
+  "RoomScale": true,
+  "PlayArea": [3.0, 3.0]
+}
+```
+
+### VR Performance
+```json
+{
+  "TargetFrameRate": 90,
+  "DynamicResolution": true,
+  "MinResolutionScale": 0.7,
+  "MaxResolutionScale": 1.0
+}
+```
+
+---
+
+## Quality Presets
+
+### High Quality (PC)
+- Lumen GI and Reflections
+- TSR Anti-Aliasing
+- High Shadow Quality
+- Full Resolution Textures
+
+### Medium Quality (Console)
+- Hardware Ray Tracing
+- TAA Anti-Aliasing
+- Medium Shadow Quality
+- Scaled Textures
+
+### Low Quality (Mobile/Web)
+- Standard Lighting
+- FXAA Anti-Aliasing
+- Low Shadow Quality
+- Compressed Textures
+
+---
+
+## Notes
+- [ ] Test scene performance on target platforms
+- [ ] Verify medical model accuracy with subject matter experts
+- [ ] Ensure all materials are optimized
+- [ ] Check lighting consistency across different viewing angles
+- [ ] Validate interactive elements functionality
+- [ ] Review accessibility features (color blindness, subtitles)
+
+## Version Control
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0 | [Date] | [Author] | Initial configuration |
